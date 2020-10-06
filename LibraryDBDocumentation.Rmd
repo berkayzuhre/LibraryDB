@@ -1,11 +1,39 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+---
+title: "LibraryDB"
+author: "Berkay Zühre"
+date: "October 1, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("jpeg")
+```
+
+## Library Database
+  In this project I have implemented a simple library database and user interface with SQLite Studio and Shiny package in R. Users can:
+  .	Insert a book
+  .	Delete a book
+  .	Search book according to various fields
+  .	Borrow books for 2 weeks
+  
+###Relation Definitions
+  I have created 4 tables to store the relevant data. Books, Authors, Users are real data. Borrowed Books Table is a combination of two real data tables. That is why it has two primary keys each one comes from a different real data table.
+  My tables are in conformity with the normal forms because there is no redundant, repeating data. For example, if I didn't have Authors table, I would have to store Author Name and age in every record of the books which would make it inefficient. In this format I only store the matching Author ID in each table, and I can reach the rest of the information by joining tables, if it becomes necessary.
+  
+```{r echo=FALSE}
+jj <- readJPEG("C:/Users/Grundig/Desktop/diagram.jpg",native=TRUE)
+plot(0:1,0:1,type="n",ann=FALSE,axes=FALSE)
+rasterImage(jj,0,0,1,1)
+```
+
+###Functions
+  Before running the app, I have defined several functions to access the database and make necessary modifications. Wjile the app is running we will simply reference these functions wh,ch will make it much less complicated.
+  
+#### Create Database
+  As mentioned above I have defined 4 different tables. This function will get called at the first run of the app since it only creates the necessary tables.
+
+```{r echo=TRUE, eval=FALSE}
 
 library(shiny)
 library(DBI)
@@ -49,7 +77,12 @@ createDatabase<-function(con){
 ")
     
 }
+```
 
+#### Fill Database
+  This function will get called once as well. It simply fill up the tables with some dummy data so we can have a better start to using the app.
+
+```{r echo=TRUE, eval=FALSE}
 fillDatabase<-function(con){
   
     writeTable(con,"User",c(1188,"Berkay Zuhre"))
@@ -64,6 +97,12 @@ fillDatabase<-function(con){
     
 }
 
+```
+
+#### Write Table
+  This is a general function for inserting data to tables. This is a general function for writing to tables mainly used for development.
+
+```{r echo=TRUE, eval=FALSE}
 
 writeTable<-function(database,tableName,data){
     
@@ -78,6 +117,16 @@ writeTable<-function(database,tableName,data){
     dbWriteTable(conn=database, name=tableName, data, append=T, row.names=F)
     
 }
+
+```
+
+
+#### Write Book - Delete Book
+  This is the main functionality of our app that users can insert and delete books from the database. I am aware that using "paste" for SQL queries is open to SQL injection threats but this app is not deployed in a server so it only works locally.
+  
+  Write Book function takes Author Name but the Book table only has Author ID. So first I find the ID of the Author then insert to the Book Table.
+
+```{r echo=TRUE, eval=FALSE}
 
 writeBook<-function(database,data){
     
@@ -106,7 +155,13 @@ deleteBook<-function(database,tableName,primaryKey){
     
     dbExecute(con,str)
 }
+```
 
+#### Search Book - Borrow Book
+  Search Book query changes according to the field you want to make a search with because Author Name is stored in a different table.
+  Borrow Book function first checks if the User has already borrowed 8 books or not. If they have borrowed 8 books the app gives an error.
+
+```{r echo=TRUE, eval=FALSE}
 searchBook<-function(database,tableName,fieldName,filterValue){
     
     if(fieldName!="AuthorName"){
@@ -147,7 +202,13 @@ borrowBook<-function(database,bookISBN,personalID){
     }
     
 }
+```
 
+
+#### User Interface for the Shiny App
+  This part defines the tabs, input and output areas and their content.
+
+```{r echo=TRUE, eval=FALSE}
 
 con <- dbConnect(RSQLite::SQLite(), "LibraryDB")
 
@@ -160,8 +221,6 @@ con <- dbConnect(RSQLite::SQLite(), "LibraryDB")
 
 #createDatabase(con)
 #fillDatabase(con)
-
-
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
@@ -202,7 +261,12 @@ choices=c("Aziz Nesin","Orhan Kemal","Yasar Kemal","Sabahattin Ali","Ayse Kulin"
     )
 ))
 
-# Define server logic required to draw a histogram
+```
+
+#### Server for the Shiny App
+  This part performs the backend operations for the app. You can see logics like "if this button is pressed do this" in this part.
+
+```{r echo=TRUE, eval=FALSE}
 server <- function(input, output) {
 
     
@@ -253,6 +317,26 @@ server <- function(input, output) {
     })
     
 }
+```
 
-# Run the application 
-shinyApp(ui = ui, server = server)
+### Screenshots from the App
+Write Book Interface:
+```{r echo=FALSE}
+jj <- readJPEG("C:/Users/Grundig/Desktop/Presentation1/Slide1.JPG",native=TRUE)
+plot(0:1,0:1,type="n",ann=FALSE,axes=FALSE)
+rasterImage(jj,0,0,1,1)
+```
+
+Search Book Interface:
+```{r echo=FALSE}
+jj <- readJPEG("C:/Users/Grundig/Desktop/Presentation1/Slide2.JPG",native=TRUE)
+plot(0:1,0:1,type="n",ann=FALSE,axes=FALSE)
+rasterImage(jj,0,0,1,1)
+```
+
+Borrow Book Interface:
+```{r echo=FALSE}
+jj <- readJPEG("C:/Users/Grundig/Desktop/Presentation1/Slide3.JPG",native=TRUE)
+plot(0:1,0:1,type="n",ann=FALSE,axes=FALSE)
+rasterImage(jj,0,0,1,1)
+```
