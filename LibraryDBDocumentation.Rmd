@@ -12,13 +12,20 @@ library("jpeg")
 
 ## Library Database
   In this project I have implemented a simple library database and user interface with SQLite Studio and Shiny package in R. Users can:
-  .	Insert a book
-  .	Delete a book
-  .	Search book according to various fields
-  .	Borrow books for 2 weeks
+  
+  * Insert a book
+  
+  * Delete a book
+  
+  * Search book according to various fields
+  
+  * Borrow books for 2 weeks
+
+[Github Link](https://github.com/berkayzuhre/LibraryDB)
   
 ###Relation Definitions
   I have created 4 tables to store the relevant data. Books, Authors, Users are real data. Borrowed Books Table is a combination of two real data tables. That is why it has two primary keys each one comes from a different real data table.
+  
   My tables are in conformity with the normal forms because there is no redundant, repeating data. For example, if I didn't have Authors table, I would have to store Author Name and age in every record of the books which would make it inefficient. In this format I only store the matching Author ID in each table, and I can reach the rest of the information by joining tables, if it becomes necessary.
   
 ```{r echo=FALSE}
